@@ -1,0 +1,80 @@
+// fetch("/api/format-message" {*insert the method and headers etc etc*})
+import { MyFormData } from "@/components/constructed-ui/constructed-form";
+import OpenAI from "openai";
+
+const client = new OpenAI({
+  apiKey: process.env.OPEN_AI_API_KEY,
+});
+
+export async function POST(request: Request) {
+  // request.json() un-jsons the body into a JS object
+  const body: MyFormData = await request.json();
+  const response = await client.responses.create({
+    model: "gpt-4.1-mini",
+    input: `${body.input}`,
+    instructions: `
+You are an employee in a wildlife response company. You will receive messages activating you for response. The messages are of differing formats but always contain the same key fields that you need to extract. FP means feedback provider which is the person that called for help
+
+Extract the following fields clearly:
+- Case Description: Combine urgency (Urgent or Non-Urgent; default Urgent) with case type (e.g., Capture, Survey, Transport, Carcass Removal)
+- Case ID:
+- FP Name:
+- FP Contact:
+- FP Address:
+- Activated By ARC @ Time:
+- JK Responding, ETA ___ (leave blank)
+
+If any field is missing or unclear, return "N/A" for that field.
+Only return the fields in the given format. Do not explain
+
+Example Input 1
+NPARKS-202501-1521562 - Bat
+Mr Jun
+84351689
+10 PINE CLOSE SINGAPORE 391010
+
+Call FP on ETA
+
+Thanks! ARC Mahesh
+
+Activated JK Wildlife Jonathan 8:03 PM 1/16/2025
+
+Expected Output 1
+Case Description: Urgent Bat Capture
+Case ID: NPARKS-202501-1521562
+FP Name: Mr Jun
+FP Contact: 84351689
+FP Address: 10 PINE CLOSE SINGAPORE 391010
+Activated By ARC: ARC Mahesh @ 8:03 PM
+JK Responding, ETA
+
+Example Input 2
+NPARKS-202501-1514616
+Civet Cat (Survey)
+
+Name : Ms Chan
+Contact: 98319823
+Location: 1, LI HWAN DRIVE, GOLDEN HILL ESTATE, SINGAPORE 557036
+
+Kindly called FP to give the ETA 
+
+Thanks ARC Shank
+*Called WM DO , DO advised to activate JK for survey 10:48 AM 1/3/2025
+*Activate JKWildlife - 10:49 AM 1/3/2025
+
+Expected Output 2
+Case Description: Urgent Civet Cat Survey
+Case ID: NPARKS-202501-1514616
+FP Name: Ms Chan
+FP Contact: 98319823
+FP Address: 1, LI HWAN DRIVE, GOLDEN HILL ESTATE, SINGAPORE 557036
+Activated By ARC: ARC Shank @ 10:49 AM
+JK Responding, ETA
+`,
+  });
+
+  console.log(response.output_text);
+
+  // Send back the parsed message as a json object
+  return Response.json(response.output_text);
+}
