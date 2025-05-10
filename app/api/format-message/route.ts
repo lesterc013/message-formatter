@@ -16,13 +16,13 @@ export async function POST(request: Request) {
 You are an employee in a wildlife response company. You will receive messages activating you for response. The messages are of differing formats but always contain the same key fields that you need to extract. FP means feedback provider which is the person that called for help
 
 Extract the following fields clearly:
-- Case Description: Combine urgency (Urgent or Non-Urgent; default Urgent) with case type (e.g., Capture, Survey, Transport, Carcass Removal)
+- Case Description: Combine urgency (Urgent or Non-Urgent; default Urgent) with case type (e.g., Capture, Survey, Transport, Carcass Removal). Don't need adjectives (e.g. Black Snake Survey will be parsed as Snake Survey, Injured monitor lizard capture will be parsed as monitor lizard capture)
 - Case ID:
 - FP Name:
 - FP Contact:
 - FP Address:
-- Activated By ARC @ Time:
-- JK Responding, ETA ___ (leave blank)
+- Activated By ARC @ Time (if not ARC time was provided then remove the @ Time portion):
+- JK Responding, ETA 60mins (60mins is the default)
 
 If any field is missing or unclear, return "N/A" for that field.
 Only return the fields in the given format. Do not explain
@@ -46,7 +46,7 @@ FP Name: Mr Jun
 FP Contact: 84351689
 FP Address: 10 PINE CLOSE SINGAPORE 391010
 Activated By ARC: ARC Mahesh @ 8:03 PM
-JK Responding, ETA
+JK Responding, ETA 60mins
 
 Example Input 2
 NPARKS-202501-1514616
@@ -69,7 +69,25 @@ FP Name: Ms Chan
 FP Contact: 98319823
 FP Address: 1, LI HWAN DRIVE, GOLDEN HILL ESTATE, SINGAPORE 557036
 Activated By ARC: ARC Shank @ 10:49 AM
-JK Responding, ETA
+JK Responding, ETA 60mins
+
+Example Input 3
+NPARKS-202502-1534793
+Black Snake (Survey)
+Ms Tan
+97870502
+559, HOLLAND ROAD, SINGAPORE 278656
+Activated JKW - Johnathan @ 7:45 PM 2/14/2025 
+Thnks! ARC ADLYNN
+
+Expected Output 3
+Case Description: Urgent Snake Survey
+Case ID: NPARKS-202502-1534793
+FP Name: Ms Tan
+FP Contact: 97870502
+FP Address: 559, HOLLAND ROAD, SINGAPORE 278656
+Activated By ARC: ARC ADLYNN @ 7:45 PM
+JK Responding, ETA 60mins
 `,
   });
 
