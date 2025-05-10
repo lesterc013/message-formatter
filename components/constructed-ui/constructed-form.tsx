@@ -23,6 +23,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "../ui/label";
 import { SyncLoader } from "react-spinners";
 import { Copy } from "lucide-react";
+import TextareaAutosize from "react-textarea-autosize";
+import { cn } from "@/lib/utils";
 
 // For now, the form just has one field which is the input for the whatsapp msg that must be a string
 const formSchema = z.object({
@@ -88,7 +90,13 @@ export default function ConstructedForm() {
               <FormItem>
                 <FormLabel>Paste WhatsApp Message Here</FormLabel>
                 <FormControl>
-                  <Textarea {...field} />
+                  {/* <Textarea {...field} /> */}
+                  <TextareaAutosize
+                    minRows={5}
+                    className={cn(
+                      "border-input placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 flex field-sizing-content min-h-16 w-full rounded-md border bg-transparent px-3 py-2 text-base shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+                    )}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -105,9 +113,17 @@ export default function ConstructedForm() {
         <SyncLoader size={10} />
       ) : (
         <div>
-          <Textarea
+          {/* <Textarea
             value={parsedMessage}
             onChange={(e) => setParsedMessage(e.target.value)}
+          /> */}
+          <TextareaAutosize
+            value={parsedMessage}
+            onChange={(e) => setParsedMessage(e.target.value)}
+            minRows={5}
+            className={cn(
+              "border-input placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 flex field-sizing-content min-h-16 w-full rounded-md border bg-transparent px-3 py-2 text-base shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+            )}
           />
           <Button onClick={() => handleCopy(parsedMessage)}>
             <Copy />
